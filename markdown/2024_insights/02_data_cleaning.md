@@ -63,10 +63,6 @@ This script processes NVD JSON data for a specified year and enriches it with CI
 
 
 ```python
-import json
-import pandas as pd
-from datetime import datetime
-
 def process_nvd_data(year):
     # Define input & output paths
     file_path = f'../../data/2024_insights/raw/nvdcve-1.1-{year}.json'
@@ -196,11 +192,11 @@ def process_nvd_data(year):
 
     return df
 
+
 # Process NVD data for 2023
 df_2023 = process_nvd_data(2023)
 
 # Process NVD data for 2024
 df_2024 = process_nvd_data(2024)
 df_2024.head()
-
 ```

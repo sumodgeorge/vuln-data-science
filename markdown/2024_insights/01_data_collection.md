@@ -33,6 +33,7 @@ The following Python code will check if the required directories exist (`raw` an
 dirs = [
     "../../data/2024_insights/raw/",
     "../../data/2024_insights/processed/",
+    "../../data/2024_insights/output/",
 ]
 
 # Create 2024 Insights data directories if they don't exist
@@ -63,6 +64,7 @@ DATASETS = {
     "known_exploited_vulnerabilities.csv": "https://www.cisa.gov/sites/default/files/csv/known_exploited_vulnerabilities.csv",
 }
 
+
 def download_file(url, dest):
     """Download a file from a URL to a destination."""
     print(f"Downloading: {url}")
@@ -75,11 +77,13 @@ def download_file(url, dest):
     else:
         print(f"Failed to download {url} - Status code: {response.status_code}")
 
+
 def unzip_file(zip_path, dest_dir):
     """Unzip a file to a destination directory."""
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(dest_dir)
         print(f"Unzipped {zip_path} to {dest_dir}")
+
 
 # Main execution
 for filename, url in DATASETS.items():
@@ -92,5 +96,4 @@ for filename, url in DATASETS.items():
     if filename.endswith(".zip"):
         unzip_file(dest_path, DATA_DIR)
         dest_path.unlink()  # Remove the ZIP file after extraction
-
 ```
