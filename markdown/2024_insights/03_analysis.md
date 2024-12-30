@@ -14,8 +14,14 @@ jupyter:
 
 ```python
 import json
+from datetime import datetime
 
 import pandas as pd
+
+# Generate the current date
+generated_date = datetime.now().strftime("%Y-%m-%d")
+
+print(f"Data generated on: {generated_date}")
 ```
 
 ```python
@@ -25,13 +31,14 @@ df_2023 = pd.read_csv('../../data/2024_insights/processed/nvd_data_2023.csv')
 df_2024.head()
 ```
 
-# Overview Metrics
+## Overview Metrics
 
-This section calculates high-level aggregate metrics to summarize vulnerability data:
+This section summarizes high-level trends in vulnerability publication for 2023 and 2024 to provide a snapshot of key patterns.
 
-1. **Total Vulnerabilities Published**: Total CVEs published in each year (2023 and 2024).
-2. **Month with Most Vulnerabilities Published**: Identifies the month with the highest vulnerability count.
-3. **Vulnerability Severity Distribution**: Calculates the distribution of Critical, High, Medium, and Low severity vulnerabilities.
+Key insights calculated:
+1. **Total Vulnerabilities Published**: How many CVEs were published each year and their percentage change.
+2. **Month with Most Vulnerabilities Published**: Identifies peak publication months to understand seasonal patterns.
+3. **Vulnerability Severity Distribution**: Examines the distribution of CVEs by severity (Critical, High, Medium, Low) for risk prioritization.
 
 
 ```python
@@ -74,9 +81,21 @@ severity_distribution = {
 }
 
 overview_metrics = {
-    "total_vulnerabilities": total_vulnerabilities,
-    "month_with_most_vulnerabilities": month_with_most_vulnerabilities,
-    "severity_distribution": severity_distribution
+    "metadata": {
+        "description": "Overview metrics summarizing vulnerability data for 2023 and 2024.",
+        "generated_on": generated_date,
+        "source": ["NVD", "CISA KEV"],
+        "attribution": {
+            "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
+            "CISA KEV": "Data from CISA KEV is used under the Creative Commons 0 1.0 License."
+        },
+        "author": "2024 Vulnerability Insights Project"
+    },
+    "data": {
+        "total_vulnerabilities": total_vulnerabilities,
+        "month_with_most_vulnerabilities": month_with_most_vulnerabilities,
+        "severity_distribution": severity_distribution
+    }
 }
 
 # Save the overview_metrics to a JSON file
@@ -86,13 +105,13 @@ with open("../../data/2024_insights/output/overview_metrics.json", "w") as f:
 overview_metrics
 ```
 
-# Time-Series Metrics
+## Time-Series Metrics
 
-This section focuses on trends over time to analyze how vulnerabilities evolve month-to-month:
+Understanding vulnerability trends over time helps identify patterns in CVE publication and potential shifts in the security landscape. This section analyzes:
 
-1. **Monthly Vulnerability Counts**: Monthly counts of vulnerabilities published in 2023 and 2024.
-2. **Severity Trends**: Tracks changes in vulnerability severities (Critical, High, Medium, Low) over time.
-3. **Spike in Vulnerability Counts**: Highlights months with significant increases in vulnerability publication.
+1. **Monthly Vulnerability Counts**: Compare month-to-month vulnerability counts in 2023 and 2024.
+2. **Severity Trends**: Examine how vulnerability severities evolved over time.
+3. **Spike in Vulnerability Counts**: Highlight months with sharp increases to correlate with external events or publication cycles.
 
 
 ```python
@@ -146,9 +165,21 @@ spike_analysis = {
     }
 }
 time_series_metrics = {
-    "monthly_vulnerability_counts": monthly_vulnerability_counts,
-    "severity_trends": severity_trends,
-    "spike_analysis": spike_analysis,
+    "metadata": {
+        "description": "Time-series analysis of monthly vulnerability trends for 2023 and 2024.",
+        "generated_on": generated_date,
+        "source": ["NVD", "CISA KEV"],
+        "attribution": {
+            "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
+            "CISA KEV": "Data from CISA KEV is used under the Creative Commons 0 1.0 License."
+        },
+        "author": "2024 Vulnerability Insights Project"
+    },
+    "data": {
+        "monthly_vulnerability_counts": monthly_vulnerability_counts,
+        "severity_trends": severity_trends,
+        "spike_analysis": spike_analysis,
+    }
 }
 
 # Save the time_series_metrics to a JSON file
@@ -158,14 +189,14 @@ with open("../../data/2024_insights/output/time_series_metrics.json", "w") as f:
 time_series_metrics
 ```
 
-# Vendor/Product Analysis
+## Vendor/Product Analysis
 
-This section investigates vulnerabilities at the vendor and product levels:
+Analyzing vulnerabilities by vendor and product provides actionable insights for vendor risk management and prioritizing patches. Key metrics include:
 
-1. **Top Vendors by Vulnerabilities**: Ranks vendors with the most vulnerabilities, focusing on Critical and High severities.
-2. **Top Products by Vulnerabilities**: Visualizes vulnerabilities grouped by product, nested under their vendors.
-3. **Vulnerability Trends by Vendor**: Tracks monthly trends for top vendors across 2023 and 2024.
-4. **Critical Vulnerability Spike Analysis**: Explores Critical vulnerabilities by vendor and product for peak months.
+1. **Top Vendors by Vulnerabilities**: Identify vendors with the most vulnerabilities, focusing on high-severity issues.
+2. **Top Products by Vulnerabilities**: Drill down into specific products with the highest vulnerability counts.
+3. **Vulnerability Trends by Vendor**: Explore how vulnerabilities evolve for major vendors over time.
+4. **Critical Vulnerability Spike Analysis**: Detect peak months for critical vulnerabilities by vendor and product to focus remediation efforts.
 
 
 ```python
@@ -241,75 +272,78 @@ critical_vulns_2024 = df_2024[df_2024['CVSS_Severity'] == 'CRITICAL']
 
 for vendor in top_vendors_2024['Vendor']:
     critical_spikes["2024"][vendor] = {}
-    vendor_critical = critical_vulns_2024[critical_vulns_2024['Vendor'] == vendor]
-    for product in top_products["2024"].get(vendor, []):
-        product_name = product['Product']
-        product_critical = vendor_critical[vendor_critical['Product'] == product_name]
-        if not product_critical.empty:
-            top_month = (
-                product_critical.groupby('Published_Month').size().idxmax()
-            )
-            count = (
-                product_critical.groupby('Published_Month').size().max()
-            )
-            critical_spikes["2024"][vendor][product_name] = {
-                "month": pd.to_datetime(f"2024-{top_month}-01").strftime('%B'),
-                "count": int(count)
-            }
+vendor_critical = critical_vulns_2024[critical_vulns_2024['Vendor'] == vendor]
+for product in top_products["2024"].get(vendor, []):
+    product_name = product['Product']
+product_critical = vendor_critical[vendor_critical['Product'] == product_name]
+if not product_critical.empty:
+    top_month = (
+        product_critical.groupby('Published_Month').size().idxmax()
+    )
+count = (
+    product_critical.groupby('Published_Month').size().max()
+)
+critical_spikes["2024"][vendor][product_name] = {
+    "month": pd.to_datetime(f"2024-{top_month}-01").strftime('%B'),
+    "count": int(count)
+}
 
 for vendor in top_vendors_2023['Vendor']:
     critical_spikes["2023"][vendor] = {}
-    vendor_critical = critical_vulns_2023[critical_vulns_2023['Vendor'] == vendor]
-    for product in top_products["2023"].get(vendor, []):
-        product_name = product['Product']
-        product_critical = vendor_critical[vendor_critical['Product'] == product_name]
-        if not product_critical.empty:
-            top_month = (
-                product_critical.groupby('Published_Month').size().idxmax()
-            )
-            count = (
-                product_critical.groupby('Published_Month').size().max()
-            )
-            critical_spikes["2023"][vendor][product_name] = {
-                "month": pd.to_datetime(f"2023-{top_month}-01").strftime('%B'),
-                "count": int(count)
-            }
+vendor_critical = critical_vulns_2023[critical_vulns_2023['Vendor'] == vendor]
+for product in top_products["2023"].get(vendor, []):
+    product_name = product['Product']
+product_critical = vendor_critical[vendor_critical['Product'] == product_name]
+if not product_critical.empty:
+    top_month = (
+        product_critical.groupby('Published_Month').size().idxmax()
+    )
+count = (
+    product_critical.groupby('Published_Month').size().max()
+)
+critical_spikes["2023"][vendor][product_name] = {
+    "month": pd.to_datetime(f"2023-{top_month}-01").strftime('%B'),
+    "count": int(count)
+}
 
 # Final Vendor/Product Analysis JSON
 vendor_product = {
-    "top_vendors": {
-        "2023": top_vendors_2023.to_dict(orient='records'),
-        "2024": top_vendors_2024.to_dict(orient='records'),
+    "metadata": {
+        "description": "Vendor and product-level analysis of vulnerabilities for 2023 and 2024.",
+        "generated_on": generated_date,
+        "source": ["NVD", "CISA KEV"],
+        "attribution": {
+            "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
+            "CISA KEV": "Data from CISA KEV is used under the Creative Commons 0 1.0 License."
+        },
+        "author": "2024 Vulnerability Insights Project"
     },
-    "top_products": top_products,
-    "vendor_trends": vendor_trends,
-    "critical_spikes": critical_spikes,
+    "data": {
+        "top_vendors": {
+            "2023": top_vendors_2023.to_dict(orient='records'),
+            "2024": top_vendors_2024.to_dict(orient='records'),
+        },
+        "top_products": top_products,
+        "vendor_trends": vendor_trends,
+        "critical_spikes": critical_spikes,
+    }
 }
 
 # Save the vendor_product metrics to a JSON file
-with open("../../data/2024_insights/output/vendor_product.json", "w") as f:
+with open("../../data/2024_insights/output/vendor_product_analysis.json", "w") as f:
     json.dump(vendor_product, f)
 
 vendor_product
 ```
 
-# CISA KEV Analysis
+## CISA KEV Analysis
 
-This section evaluates the relationship between NVD data and the CISA KEV catalog:
+The Known Exploited Vulnerabilities (KEV) catalog provides critical insights for organizations to prioritize patching based on active exploitation. This analysis includes:
 
-1. **Vulnerabilities Added to CISA KEV**: Counts vulnerabilities added to the KEV catalog, with YoY comparison.
-2. **CISA KEV Overlap with NVD**: Shows percentage of NVD vulnerabilities that are also in the KEV catalog.
-3. **Top Exploited Vendors in CISA KEV**: Ranks vendors with the most KEV vulnerabilities.
-4. **Time to CISA KEV Inclusion**: Calculates time between NVD publication and KEV inclusion.
-
-
-
-# Specific CVE Details
-
-This section highlights vulnerabilities with high impact or severity:
-
-1. **Most Severe Vulnerabilities**: Lists CVEs with the highest CVSS scores.
-2. **Most Impactful Vulnerabilities**: Combines multiple factors (CVSS, KEV inclusion, exploitation evidence) to rank vulnerabilities.
+1. **Vulnerabilities Added to CISA KEV**: Tracks how many vulnerabilities were added to KEV for 2023 and 2024.
+2. **CISA KEV Overlap with NVD**: Calculates the percentage of NVD vulnerabilities also present in the KEV catalog.
+3. **Top Exploited Vendors in CISA KEV**: Identifies vendors most impacted by KEV vulnerabilities.
+4. **Time to CISA KEV Inclusion**: Measures how quickly vulnerabilities transition from publication to KEV inclusion.
 
 
 ```python
@@ -320,7 +354,7 @@ kev_records_2024 = df_2024[df_2024['CISA_KEV'] == True].copy()
 # Ensure datetime columns are in the correct format and remove timezone info
 for df in [kev_records_2023, kev_records_2024]:
     df['KEV_DateAdded'] = pd.to_datetime(df['KEV_DateAdded'], errors='coerce').dt.tz_localize(None)
-    df['Published_Date'] = pd.to_datetime(df['Published_Date'], errors='coerce').dt.tz_localize(None)
+df['Published_Date'] = pd.to_datetime(df['Published_Date'], errors='coerce').dt.tz_localize(None)
 
 # Group CISA KEV Data by Month for 2023 and 2024
 kev_additions = {
@@ -376,12 +410,12 @@ top_kev_vendors = {
 vendor_rank_changes = []
 for vendor in {v['KEV_Vendor'] for v in top_kev_vendors['2024']}:
     rank_2023 = next((i + 1 for i, v in enumerate(top_kev_vendors['2023']) if v['KEV_Vendor'] == vendor), None)
-    rank_2024 = next((i + 1 for i, v in enumerate(top_kev_vendors['2024']) if v['KEV_Vendor'] == vendor), None)
-    vendor_rank_changes.append({
-        "vendor": vendor,
-        "2023_rank": rank_2023,
-        "2024_rank": rank_2024
-    })
+rank_2024 = next((i + 1 for i, v in enumerate(top_kev_vendors['2024']) if v['KEV_Vendor'] == vendor), None)
+vendor_rank_changes.append({
+    "vendor": vendor,
+    "2023_rank": rank_2023,
+    "2024_rank": rank_2024
+})
 
 # Sort the vendor_rank_changes by 2024 rank
 vendor_rank_changes = sorted(vendor_rank_changes, key=lambda x: x["2024_rank"] if x["2024_rank"] else float('inf'))
@@ -390,39 +424,51 @@ vendor_rank_changes = sorted(vendor_rank_changes, key=lambda x: x["2024_rank"] i
 time_to_kev_inclusion = {}
 for year, records in {"2023": kev_records_2023, "2024": kev_records_2024}.items():
     inclusion_times = records[records['KEV_DateAdded'].dt.year == int(year)].copy()
-    inclusion_times['Time_To_KEV'] = (
-            inclusion_times['KEV_DateAdded'] - inclusion_times['Published_Date']
-    ).dt.days
-    inclusion_times = inclusion_times[inclusion_times['Time_To_KEV'] >= 0]
-    time_to_kev_inclusion[year] = {
-        "min_days": int(inclusion_times['Time_To_KEV'].min()) if not inclusion_times.empty else None,
-        "max_days": int(inclusion_times['Time_To_KEV'].max()) if not inclusion_times.empty else None,
-        "average_days": round(float(inclusion_times['Time_To_KEV'].mean()), 2) if not inclusion_times.empty else None
-    }
+inclusion_times['Time_To_KEV'] = (
+        inclusion_times['KEV_DateAdded'] - inclusion_times['Published_Date']
+).dt.days
+inclusion_times = inclusion_times[inclusion_times['Time_To_KEV'] >= 0]
+time_to_kev_inclusion[year] = {
+    "min_days": int(inclusion_times['Time_To_KEV'].min()) if not inclusion_times.empty else None,
+    "max_days": int(inclusion_times['Time_To_KEV'].max()) if not inclusion_times.empty else None,
+    "average_days": round(float(inclusion_times['Time_To_KEV'].mean()), 2) if not inclusion_times.empty else None
+}
 
 # Final JSON Structure
 cisa_kev = {
-    "kev_additions": kev_additions,
-    "kev_monthly_changes": kev_monthly_changes,
-    "nvd_kev_overlap": {
-        "data": kev_overlap,
-        "note": "Percentage of NVD vulnerabilities in a month that were also added to KEV."
+    "metadata": {
+        "description": "Analysis of CISA KEV catalog inclusion and overlap with NVD vulnerabilities for 2023 and 2024.",
+        "generated_on": generated_date,
+        "source": ["NVD", "CISA KEV"],
+        "attribution": {
+            "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
+            "CISA KEV": "Data from CISA KEV is used under the Creative Commons 0 1.0 License."
+        },
+        "author": "2024 Vulnerability Insights Project"
     },
-    "top_kev_vendors": top_kev_vendors,
-    "vendor_rank_changes": vendor_rank_changes,
-    "time_to_kev_inclusion": time_to_kev_inclusion
+    "data": {
+        "kev_additions": kev_additions,
+        "kev_monthly_changes": kev_monthly_changes,
+        "nvd_kev_overlap": {
+            "data": kev_overlap,
+            "note": "Percentage of NVD vulnerabilities in a month that were also added to KEV."
+        },
+        "top_kev_vendors": top_kev_vendors,
+        "vendor_rank_changes": vendor_rank_changes,
+        "time_to_kev_inclusion": time_to_kev_inclusion
+    }
 }
 
 # Save the cisa_kev metrics to a JSON file
-with open("../../data/2024_insights/output/cisa_kev.json", "w") as f:
+with open("../../data/2024_insights/output/cisa_kev_analysis.json", "w") as f:
     json.dump(cisa_kev, f)
 
 cisa_kev
 ```
 
-# Specific CVE Details
+## Specific CVE Details
 
-This section highlights vulnerabilities with high impact or severity:
+This section highlights vulnerabilities with high impact or severity to assist in prioritization and understanding of high-risk CVEs:
 
 1. **Most Severe Vulnerabilities**: Lists CVEs with the highest CVSS scores.
 2. **Most Impactful Vulnerabilities**: Combines multiple factors (CVSS, KEV inclusion, exploitation evidence) to rank vulnerabilities.
@@ -441,9 +487,9 @@ if remaining_cves_needed > 0:
         .drop_duplicates()
         .head(remaining_cves_needed)
     )
-    most_severe = pd.concat([cvss_10_cves, additional_cves]).drop_duplicates()
+most_severe = pd.concat([cvss_10_cves, additional_cves]).drop_duplicates()
 else:
-    most_severe = cvss_10_cves
+most_severe = cvss_10_cves
 
 # Ensure the final result is sorted and unique
 most_severe = (
@@ -458,6 +504,8 @@ df_2024['Exploitation_Evidence'] = df_2024['CVE_ID'].isin(kev_records_2024['CVE_
 
 
 # Define Impact Score calculation function
+
+
 def calculate_impact_score(row):
     exploitation_weight = 10 if row['Exploitation_Evidence'] else 0
     impact_score = row['CVSS_Base_Score'] * 2 + exploitation_weight
@@ -478,27 +526,39 @@ most_impactful = (
 
 # Final JSON structure
 specific_cve_details = {
-    "most_severe": most_severe,
-    "most_impactful": most_impactful,
-    "notes": {
-        "most_severe": "Includes all CVEs with CVSS_Base_Score of 10.0 and additional CVEs to make a total of 25, if fewer than 25 CVSS 10.0 CVEs exist.",
-        "most_impactful": "Top 10 CVEs by impact score, prioritizing exploitation evidence."
+    "metadata": {
+        "description": "Detailed analysis of the most severe and impactful CVEs for 2024.",
+        "generated_on": generated_date,
+        "source": ["NVD", "CISA KEV"],
+        "attribution": {
+            "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
+            "CISA KEV": "Data from CISA KEV is used under the Creative Commons 0 1.0 License."
+        },
+        "author": "2024 Vulnerability Insights Project"
+    },
+    "data": {
+        "most_severe": most_severe,
+        "most_impactful": most_impactful,
+        "notes": {
+            "most_severe": "Includes all CVEs with CVSS_Base_Score of 10.0 and additional CVEs to make a total of 25, if fewer than 25 CVSS 10.0 CVEs exist.",
+            "most_impactful": "Top 10 CVEs by impact score, prioritizing exploitation evidence."
+        }
     }
 }
 
 # Save the specific_cve_details metrics to a JSON file
-with open("../../data/2024_insights/output/specific_cve_details.json", "w") as f:
+with open("../../data/2024_insights/output/cve_details.json", "w") as f:
     json.dump(specific_cve_details, f)
 
 specific_cve_details
 ```
 
-# CVE Assigner Analysis
+## CVE Assigner Analysis
 
-This section identifies the organizations assigning the most CVEs:
+This section identifies the organizations assigning the most CVEs to understand trends and priorities in vulnerability reporting.
 
-1. **Top CVE Assigners**: Highlights top assigners by the number of CVEs and severity breakdown (Critical and High).
-
+1. **Top CVE Assigners**: Highlights top assigners by the number of CVEs and severity breakdown (Critical, High, Medium, Low).
+2. **Year-over-Year Comparison**: Provides insights into changes in CVE assignment trends between 2023 and 2024.
 
 ```python
 # Group by CVE Assigner for 2023 and 2024 with severity breakdown and total counts
@@ -547,19 +607,31 @@ percentage_changes = {
 
 # Transform to JSON-friendly structure
 top_assigners = {
-    "top_assigners": {
-        "2023": top_assigners_2023.to_dict(orient='records'),
-        "2024": top_assigners_2024.to_dict(orient='records'),
-        "comparison_notes": (
-            "Critical: CVSS >= 9.0, High: 7.0 <= CVSS < 9.0, "
-            "Medium: 4.0 <= CVSS < 7.0, Low: CVSS < 4.0. "
-            "Shows top assigners for each year with severity breakdowns, "
-            "total counts, and year-over-year changes."
-        ),
-        "totals": {
-            "2023": total_2023,
-            "2024": total_2024,
-            "percentage_changes": percentage_changes
+    "metadata": {
+        "description": "Analysis of top CVE assigners and severity breakdowns for 2023 and 2024.",
+        "generated_on": generated_date,
+        "source": ["NVD", "CISA KEV"],
+        "attribution": {
+            "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
+            "CISA KEV": "Data from CISA KEV is used under the Creative Commons 0 1.0 License."
+        },
+        "author": "2024 Vulnerability Insights Project"
+    },
+    "data": {
+        "top_assigners": {
+            "2023": top_assigners_2023.to_dict(orient='records'),
+            "2024": top_assigners_2024.to_dict(orient='records'),
+            "comparison_notes": (
+                "Critical: CVSS >= 9.0, High: 7.0 <= CVSS < 9.0, "
+                "Medium: 4.0 <= CVSS < 7.0, Low: CVSS < 4.0. "
+                "Shows top assigners for each year with severity breakdowns, "
+                "total counts, and year-over-year changes."
+            ),
+            "totals": {
+                "2023": total_2023,
+                "2024": total_2024,
+                "percentage_changes": percentage_changes
+            }
         }
     }
 }
