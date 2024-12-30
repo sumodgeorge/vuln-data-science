@@ -270,41 +270,53 @@ critical_spikes = {"2023": {}, "2024": {}}
 critical_vulns_2023 = df_2023[df_2023['CVSS_Severity'] == 'CRITICAL']
 critical_vulns_2024 = df_2024[df_2024['CVSS_Severity'] == 'CRITICAL']
 
+# For 2024
 for vendor in top_vendors_2024['Vendor']:
     critical_spikes["2024"][vendor] = {}
-vendor_critical = critical_vulns_2024[critical_vulns_2024['Vendor'] == vendor]
-for product in top_products["2024"].get(vendor, []):
-    product_name = product['Product']
-product_critical = vendor_critical[vendor_critical['Product'] == product_name]
-if not product_critical.empty:
-    top_month = (
-        product_critical.groupby('Published_Month').size().idxmax()
-    )
-count = (
-    product_critical.groupby('Published_Month').size().max()
-)
-critical_spikes["2024"][vendor][product_name] = {
-    "month": pd.to_datetime(f"2024-{top_month}-01").strftime('%B'),
-    "count": int(count)
-}
+    vendor_critical = critical_vulns_2024[critical_vulns_2024['Vendor'] == vendor]
+    for product in top_products["2024"].get(vendor, []):
+        product_name = product['Product']
+        product_critical = vendor_critical[vendor_critical['Product'] == product_name]
+        if not product_critical.empty:
+            top_month = (
+                product_critical.groupby('Published_Month').size().idxmax()
+            )
+            count = (
+                product_critical.groupby('Published_Month').size().max()
+            )
+            critical_spikes["2024"][vendor][product_name] = {
+                "month": pd.to_datetime(f"2024-{top_month}-01").strftime('%B'),
+                "count": int(count)
+            }
+        else:
+            critical_spikes["2024"][vendor][product_name] = {
+                "month": None,
+                "count": 0
+            }
 
+# For 2023
 for vendor in top_vendors_2023['Vendor']:
     critical_spikes["2023"][vendor] = {}
-vendor_critical = critical_vulns_2023[critical_vulns_2023['Vendor'] == vendor]
-for product in top_products["2023"].get(vendor, []):
-    product_name = product['Product']
-product_critical = vendor_critical[vendor_critical['Product'] == product_name]
-if not product_critical.empty:
-    top_month = (
-        product_critical.groupby('Published_Month').size().idxmax()
-    )
-count = (
-    product_critical.groupby('Published_Month').size().max()
-)
-critical_spikes["2023"][vendor][product_name] = {
-    "month": pd.to_datetime(f"2023-{top_month}-01").strftime('%B'),
-    "count": int(count)
-}
+    vendor_critical = critical_vulns_2023[critical_vulns_2023['Vendor'] == vendor]
+    for product in top_products["2023"].get(vendor, []):
+        product_name = product['Product']
+        product_critical = vendor_critical[vendor_critical['Product'] == product_name]
+        if not product_critical.empty:
+            top_month = (
+                product_critical.groupby('Published_Month').size().idxmax()
+            )
+            count = (
+                product_critical.groupby('Published_Month').size().max()
+            )
+            critical_spikes["2023"][vendor][product_name] = {
+                "month": pd.to_datetime(f"2023-{top_month}-01").strftime('%B'),
+                "count": int(count)
+            }
+        else:
+            critical_spikes["2023"][vendor][product_name] = {
+                "month": None,
+                "count": 0
+            }
 
 # Final Vendor/Product Analysis JSON
 vendor_product = {
@@ -487,9 +499,9 @@ if remaining_cves_needed > 0:
         .drop_duplicates()
         .head(remaining_cves_needed)
     )
-most_severe = pd.concat([cvss_10_cves, additional_cves]).drop_duplicates()
+    most_severe = pd.concat([cvss_10_cves, additional_cves]).drop_duplicates()
 else:
-most_severe = cvss_10_cves
+    most_severe = cvss_10_cves
 
 # Ensure the final result is sorted and unique
 most_severe = (
