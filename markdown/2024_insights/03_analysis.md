@@ -475,12 +475,6 @@ This section highlights vulnerabilities with high impact or severity to assist i
 2. **Most Impactful Vulnerabilities**: Combines multiple factors (CVSS, KEV inclusion, exploitation evidence) to rank vulnerabilities.
 
 ```python
-import pandas as pd
-import json
-
-# Set the generated date for metadata
-generated_date = "2024-12-30"
-
 # Filter for all CVEs with CVSS_Base_Score of 10.0
 cvss_10_cves = df_2024[df_2024['CVSS_Base_Score'] == 10.0].copy()
 
@@ -551,10 +545,25 @@ specific_cve_details = {
     }
 }
 
+
+# Handle NaN values in the output
+def handle_nan_values(obj):
+    if isinstance(obj, float) and pd.isna(obj):
+        return None  # Replace NaN with null for JSON compatibility
+    if isinstance(obj, dict):
+        return {key: handle_nan_values(value) for key, value in obj.items()}
+    if isinstance(obj, list):
+        return [handle_nan_values(value) for value in obj]
+    return obj
+
+
+# Process the JSON data to handle NaN values
+specific_cve_details_cleaned = handle_nan_values(specific_cve_details)
+
 # Save the specific CVE details to a JSON file
 output_path = "../../data/2024_insights/output/cve_details.json"
 with open(output_path, "w") as f:
-    json.dump(specific_cve_details, f)
+    json.dump(specific_cve_details_cleaned, f)
 ```
 
 ## CVE Assigner Analysis
