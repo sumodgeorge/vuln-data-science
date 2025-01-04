@@ -13,6 +13,7 @@ jupyter:
 ---
 
 ```python
+
 import json
 from datetime import datetime
 
@@ -42,6 +43,7 @@ Key insights calculated:
 
 
 ```python
+# Calculate total vulnerabilities for each year
 total_vulns_2023 = df_2023.shape[0]
 total_vulns_2024 = df_2024.shape[0]
 percentage_change = round(((total_vulns_2024 - total_vulns_2023) / total_vulns_2023) * 100, 3)
@@ -52,11 +54,10 @@ total_vulnerabilities = {
     "percentage_change": percentage_change
 }
 
-# 2023 Data
+# Calculate month with the most vulnerabilities for each year
 month_2023 = df_2023['Published_Month'].value_counts().idxmax()
 count_2023 = df_2023['Published_Month'].value_counts().max()
 
-# 2024 Data
 month_2024 = df_2024['Published_Month'].value_counts().idxmax()
 count_2024 = df_2024['Published_Month'].value_counts().max()
 
@@ -75,11 +76,13 @@ month_with_most_vulnerabilities = {
     }
 }
 
+# Generate severity distribution for each year
 severity_distribution = {
     "2023": df_2023['CVSS_Severity'].value_counts().to_dict(),
     "2024": df_2024['CVSS_Severity'].value_counts().to_dict()
 }
 
+# Final JSON structure
 overview_metrics = {
     "metadata": {
         "description": "Overview metrics summarizing vulnerability data for 2023 and 2024.",
@@ -98,11 +101,10 @@ overview_metrics = {
     }
 }
 
-# Save the overview_metrics to a JSON file
-with open("../../data/2024_insights/output/overview_metrics.json", "w") as f:
+# Save the overview metrics to a JSON file
+output_path = "../../data/2024_insights/output/overview_metrics.json"
+with open(output_path, "w") as f:
     json.dump(overview_metrics, f)
-
-overview_metrics
 ```
 
 ## Time-Series Metrics
@@ -185,8 +187,6 @@ time_series_metrics = {
 # Save the time_series_metrics to a JSON file
 with open("../../data/2024_insights/output/time_series_metrics.json", "w") as f:
     json.dump(time_series_metrics, f)
-
-time_series_metrics
 ```
 
 ## Vendor/Product Analysis
@@ -344,8 +344,6 @@ vendor_product = {
 # Save the vendor_product metrics to a JSON file
 with open("../../data/2024_insights/output/vendor_product_analysis.json", "w") as f:
     json.dump(vendor_product, f)
-
-vendor_product
 ```
 
 ## CISA KEV Analysis
@@ -363,10 +361,23 @@ The Known Exploited Vulnerabilities (KEV) catalog provides critical insights for
 kev_records_2023 = df_2023[df_2023['CISA_KEV'] == True].copy()
 kev_records_2024 = df_2024[df_2024['CISA_KEV'] == True].copy()
 
-# Ensure datetime columns are in the correct format and remove timezone info
-for df in [kev_records_2023, kev_records_2024]:
-    df['KEV_DateAdded'] = pd.to_datetime(df['KEV_DateAdded'], errors='coerce').dt.tz_localize(None)
-df['Published_Date'] = pd.to_datetime(df['Published_Date'], errors='coerce').dt.tz_localize(None)
+
+# Function to ensure proper datetime conversion
+def ensure_datetime_conversion(df, column_name):
+    df[column_name] = pd.to_datetime(df[column_name], errors='coerce')
+    if not pd.api.types.is_datetime64_any_dtype(df[column_name]):
+        raise ValueError(f"Column {column_name} could not be converted to datetime64[ns]!")
+
+
+# Ensure datetime for all relevant columns
+for df in [df_2023, df_2024, kev_records_2023, kev_records_2024]:
+    ensure_datetime_conversion(df, 'Published_Date')
+    ensure_datetime_conversion(df, 'KEV_DateAdded')
+
+# Remove timezone info
+for df in [df_2023, df_2024, kev_records_2023, kev_records_2024]:
+    df['Published_Date'] = df['Published_Date'].dt.tz_localize(None)
+    df['KEV_DateAdded'] = df['KEV_DateAdded'].dt.tz_localize(None)
 
 # Group CISA KEV Data by Month for 2023 and 2024
 kev_additions = {
@@ -391,7 +402,7 @@ kev_monthly_changes = {
 
 # Calculate NVD-KEV Overlap Percentage
 nvd_cve_counts = {
-    year: df.groupby('Published_Month').size().reindex(range(1, 13), fill_value=0)
+    year: df.groupby(df['Published_Date'].dt.month).size().reindex(range(1, 13), fill_value=0)
     for year, df in {"2023": df_2023, "2024": df_2024}.items()
 }
 
@@ -404,53 +415,33 @@ kev_overlap = {
     for year in ["2023", "2024"]
 }
 
-# Top Vendors in KEV Catalog for 2023 and 2024
+# Top Vendors in KEV Catalog
 top_kev_vendors = {
     year: (
-        records[records['KEV_DateAdded'].dt.year == int(year)]
-        .groupby('KEV_Vendor')
-        .size()
-        .sort_values(ascending=False)
-        .head(10)
-        .reset_index(name='kev_count')
-        .to_dict(orient='records')
+        records.groupby('KEV_Vendor').size()
+        .sort_values(ascending=False).head(10)
+        .reset_index(name='kev_count').to_dict(orient='records')
     )
     for year, records in {"2023": kev_records_2023, "2024": kev_records_2024}.items()
 }
 
-# Vendor Ranking Changes (Prioritize 2024 top vendors and compare with 2023)
+# Vendor Ranking Changes
 vendor_rank_changes = []
-for vendor in {v['KEV_Vendor'] for v in top_kev_vendors['2024']}:
+all_vendors = {v['KEV_Vendor'] for v in top_kev_vendors['2024']}
+for vendor in all_vendors:
     rank_2023 = next((i + 1 for i, v in enumerate(top_kev_vendors['2023']) if v['KEV_Vendor'] == vendor), None)
-rank_2024 = next((i + 1 for i, v in enumerate(top_kev_vendors['2024']) if v['KEV_Vendor'] == vendor), None)
-vendor_rank_changes.append({
-    "vendor": vendor,
-    "2023_rank": rank_2023,
-    "2024_rank": rank_2024
-})
+    rank_2024 = next((i + 1 for i, v in enumerate(top_kev_vendors['2024']) if v['KEV_Vendor'] == vendor), None)
+    vendor_rank_changes.append({
+        "vendor": vendor,
+        "2023_rank": rank_2023 or "Not Ranked",
+        "2024_rank": rank_2024 or "Not Ranked"
+    })
 
-# Sort the vendor_rank_changes by 2024 rank
-vendor_rank_changes = sorted(vendor_rank_changes, key=lambda x: x["2024_rank"] if x["2024_rank"] else float('inf'))
-
-# Time to KEV Inclusion Metrics for 2023 and 2024
-time_to_kev_inclusion = {}
-for year, records in {"2023": kev_records_2023, "2024": kev_records_2024}.items():
-    inclusion_times = records[records['KEV_DateAdded'].dt.year == int(year)].copy()
-inclusion_times['Time_To_KEV'] = (
-        inclusion_times['KEV_DateAdded'] - inclusion_times['Published_Date']
-).dt.days
-inclusion_times = inclusion_times[inclusion_times['Time_To_KEV'] >= 0]
-time_to_kev_inclusion[year] = {
-    "min_days": int(inclusion_times['Time_To_KEV'].min()) if not inclusion_times.empty else None,
-    "max_days": int(inclusion_times['Time_To_KEV'].max()) if not inclusion_times.empty else None,
-    "average_days": round(float(inclusion_times['Time_To_KEV'].mean()), 2) if not inclusion_times.empty else None
-}
-
-# Final JSON Structure
+# Prepare JSON Data
 cisa_kev = {
     "metadata": {
         "description": "Analysis of CISA KEV catalog inclusion and overlap with NVD vulnerabilities for 2023 and 2024.",
-        "generated_on": generated_date,
+        "generated_on": "2025-01-04",  # Example date, replace with actual
         "source": ["NVD", "CISA KEV"],
         "attribution": {
             "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD.",
@@ -466,16 +457,14 @@ cisa_kev = {
             "note": "Percentage of NVD vulnerabilities in a month that were also added to KEV."
         },
         "top_kev_vendors": top_kev_vendors,
-        "vendor_rank_changes": vendor_rank_changes,
-        "time_to_kev_inclusion": time_to_kev_inclusion
+        "vendor_rank_changes": vendor_rank_changes
     }
 }
 
-# Save the cisa_kev metrics to a JSON file
-with open("../../data/2024_insights/output/cisa_kev_analysis.json", "w") as f:
+# Save JSON to File
+output_path = "../../data/2024_insights/output/cisa_kev_analysis.json"
+with open(output_path, "w") as f:
     json.dump(cisa_kev, f)
-
-cisa_kev
 ```
 
 ## Specific CVE Details
@@ -486,10 +475,16 @@ This section highlights vulnerabilities with high impact or severity to assist i
 2. **Most Impactful Vulnerabilities**: Combines multiple factors (CVSS, KEV inclusion, exploitation evidence) to rank vulnerabilities.
 
 ```python
-# Filter for all CVEs with CVSS_Base_Score of 10.0
-cvss_10_cves = df_2024[df_2024['CVSS_Base_Score'] == 10.0]
+import pandas as pd
+import json
 
-# Additional CVEs to include if fewer than 25
+# Set the generated date for metadata
+generated_date = "2024-12-30"
+
+# Filter for all CVEs with CVSS_Base_Score of 10.0
+cvss_10_cves = df_2024[df_2024['CVSS_Base_Score'] == 10.0].copy()
+
+# Determine if additional CVEs are needed to make up a total of 25
 remaining_cves_needed = 25 - len(cvss_10_cves)
 if remaining_cves_needed > 0:
     additional_cves = (
@@ -503,7 +498,7 @@ if remaining_cves_needed > 0:
 else:
     most_severe = cvss_10_cves
 
-# Ensure the final result is sorted and unique
+# Sort and format most severe CVEs
 most_severe = (
     most_severe.sort_values(by=['CVSS_Base_Score', 'CVE_ID'], ascending=[False, True])
     [['CVE_ID', 'Description', 'CVSS_Base_Score', 'Vendor', 'Product']]
@@ -511,32 +506,30 @@ most_severe = (
     .to_dict(orient='records')
 )
 
-# Add exploitation evidence if not already present
+# Add exploitation evidence to the dataset
 df_2024['Exploitation_Evidence'] = df_2024['CVE_ID'].isin(kev_records_2024['CVE_ID'])
 
 
-# Define Impact Score calculation function
-
-
+# Define a function to calculate the Impact Score
 def calculate_impact_score(row):
     exploitation_weight = 10 if row['Exploitation_Evidence'] else 0
     impact_score = row['CVSS_Base_Score'] * 2 + exploitation_weight
     return round(impact_score, 2)
 
 
-# Calculate Impact Scores
+# Calculate Impact Scores for all CVEs
 df_2024['Impact_Score'] = df_2024.apply(calculate_impact_score, axis=1)
 
-# Filter for most impactful CVEs
+# Filter for the most impactful CVEs
 most_impactful = (
     df_2024.sort_values(by=['Impact_Score', 'CVE_ID'], ascending=[False, True])
     [['CVE_ID', 'Impact_Score', 'Exploitation_Evidence', 'Vendor', 'Product']]
     .drop_duplicates()
-    .head(10)  # Top 10 CVEs
+    .head(10)  # Select the top 10 CVEs
     .to_dict(orient='records')
 )
 
-# Final JSON structure
+# Construct the final JSON structure
 specific_cve_details = {
     "metadata": {
         "description": "Detailed analysis of the most severe and impactful CVEs for 2024.",
@@ -558,11 +551,10 @@ specific_cve_details = {
     }
 }
 
-# Save the specific_cve_details metrics to a JSON file
-with open("../../data/2024_insights/output/cve_details.json", "w") as f:
+# Save the specific CVE details to a JSON file
+output_path = "../../data/2024_insights/output/cve_details.json"
+with open(output_path, "w") as f:
     json.dump(specific_cve_details, f)
-
-specific_cve_details
 ```
 
 ## CVE Assigner Analysis
@@ -574,7 +566,6 @@ This section identifies the organizations assigning the most CVEs to understand 
 
 ```python
 # Group by CVE Assigner for 2023 and 2024 with severity breakdown and total counts
-
 
 def get_top_assigners_with_totals(df, year):
     assigner_data = (
@@ -651,6 +642,4 @@ top_assigners = {
 # Save the top_assigners metrics to a JSON file
 with open("../../data/2024_insights/output/top_assigners.json", "w") as f:
     json.dump(top_assigners, f)
-
-top_assigners
 ```
