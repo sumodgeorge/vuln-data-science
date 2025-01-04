@@ -1,7 +1,7 @@
 # vuln-data-science
 
 ![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Python Version](https://img.shields.io/badge/Python-3.7%2B-blue.svg)
+![Python Version](https://img.shields.io/badge/Python-3.11%2B-blue.svg)
 
 Welcome to the vuln-data-science repository! This project focuses on applying data science techniques to vulnerability
 management and analysis. Our goal is to explore, analyze, and share insights on vulnerabilities using data science
@@ -48,7 +48,7 @@ professionals.
 - **Data Cleaning**: Techniques to preprocess and clean the data for analysis.
 - **Exploratory Data Analysis**: Visualizations and insights into vulnerability trends.
 - **Predictive Analysis**: Models to predict future vulnerabilities and their potential impact.
-- **Tools & Libraries**: Utilization of tools like Pandas, Polars, Matplotlib, and Scikit-learn for data processing and
+- **Tools & Libraries**: Utilization of tools like Pandas, Matplotlib, Seaborn, and Scikit-learn for data processing and
   analysis.
 
 ## Getting Started
@@ -57,7 +57,7 @@ professionals.
 
 Before you begin, ensure you have the following software installed:
 
-- Python 3.7 or higher
+- Python 3.11 or higher
 
 ### Installation
 
@@ -93,20 +93,20 @@ Before you begin, ensure you have the following software installed:
 5. Install the required dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   pip install .
+   ```
+
+   Alternatively, if you use Hatch, you can set up the environment with:
+
+   ```bash
+   hatch env create
+   hatch shell
    ```
 
 ## Usage
 
 To start exploring the data and running the analyses, open the Jupyter notebooks in the `notebooks` directory. Each
-notebook focuses on a different aspect of the data pipeline:
-
-- `01_data_collection.ipynb`: Collects and aggregates data from various vulnerability sources.
-- `02_data_cleaning.ipynb`: Cleans and preprocesses the raw data for analysis.
-- `03_weighted_vulnerability_scoring.ipynb`: Applies weighted scoring to prioritize vulnerabilities based on multiple
-  factors.
-- `04_analysis.ipynb`: Analyzes the processed data to identify trends and insights.
-- `05_summary.ipynb`: Summarizes the findings and prepares the final report.
+notebook focuses on a different aspect of the data pipeline.
 
 You can launch Jupyter Notebook with the following command:
 
@@ -116,70 +116,17 @@ jupyter notebook
 
 Navigate to the `notebooks` directory and open any notebook to get started.
 
-To keep the Markdown files in sync with the Jupyter notebooks, you can use the provided conversion script:
-
-```bash
-python scripts/nb_to_md.py
-```
-
-This script requires the `jupytext` package, which will be installed with the other dependencies.
-
 ## Project Structure
 
 ```
 vuln-data-science/
 ├── data/
-│   ├── raw/
-│   ├── processed/
 ├── notebooks/
-│   ├── patch_tuesday/
-│   │   ├── 01_data_collection.ipynb
-│   │   ├── 02_data_cleaning.ipynb
-│   │   ├── 03_weighted_vulnerability_scoring.ipynb
-│   │   ├── 04_analysis.ipynb
-│   │   ├── 05_summary.ipynb
-├── markdown/
 ├── scripts/
 │   ├── nb_to_md.py
 ├── README.md
-├── requirements.txt
 └── LICENSE
 ```
-
-- `data/`: Contains raw and processed data files, organized by project (e.g., `patch_tuesday`, `weekly_cve`).
-- `notebooks/`: Jupyter notebooks for data exploration, cleaning, and analysis.
-- `markdown/`: Markdown versions of the Jupyter notebooks.
-- `scripts/`: Python scripts for data processing and analysis tools.
-- `README.md`: Project documentation.
-- `requirements.txt`: List of dependencies.
-- `LICENSE`: License information.
-
-## Notebooks and Markdown
-
-Jupyter notebooks are located in the `/notebooks` directory. These contain code and analysis for various aspects of
-vulnerability management. For convenience, markdown versions are available in the `/markdown` directory.
-
-To keep the Markdown files in sync with the Jupyter notebooks, use the conversion script:
-
-```bash
-python scripts/nb_to_md.py
-```
-
-The `jupytext` package will be installed with the other dependencies.
-
-### Patch Tuesday
-
-#### Notebooks
-
-- [Data Collection Notebook](notebooks/patch_tuesday/01_data_collection.ipynb)
-- [Data Cleaning Notebook](notebooks/patch_tuesday/02_data_cleaning.ipynb)
-- [Vulnerability Analysis Notebook](notebooks/patch_tuesday/03_vulnerability_analysis.ipynb)
-
-#### Markdown
-
-- [Data Collection Markdown](markdown/patch_tuesday/01_data_collection.md)
-- [Data Cleaning Markdown](markdown/patch_tuesday/02_data_cleaning.md)
-- [Vulnerability Analysis Markdown](markdown/patch_tuesday/03_vulnerability_analysis.md)
 
 ## Contributing
 
@@ -203,10 +150,50 @@ We plan to expand the project with the following features:
 - **Advanced Analytics**: Machine learning models for predicting vulnerability exploitation likelihood.
 - **Visualization Dashboards**: Interactive dashboards for visualizing trends and insights.
 
-## Acknowledgments
+### Data Usage and Attribution
+
+This project uses data from various publicly available sources. Please ensure compliance with their respective usage
+agreements and attribution requirements if you use or redistribute the data.
+
+#### **NIST National Vulnerability Database (NVD)**
+
+- Website: [NVD Developers - Terms of Use](https://nvd.nist.gov/developers/terms-of-use)
+- **Attribution Requirement**:
+    - Services utilizing the NVD API must display the following notice prominently:
+      > "This product uses the NVD API but is not endorsed or certified by the NVD."
+    - The NVD name may only be used to identify the source of API content and may not imply endorsement of any product
+      or service.
+
+#### **CISA Known Exploited Vulnerabilities (KEV)**
+
+- Website: [CISA KEV License](https://www.cisa.gov/sites/default/files/licenses/kev/license.txt)
+- **License**:
+    - The KEV database is distributed under the **Creative Commons 0 1.0 License**.
+    - You may use this data in any legal manner, but note:
+        - Information provided at any 3rd-party links included in the KEV database is bound by the policies and licenses
+          of those third-party websites.
+        - Use of the information does not authorize you to use the **CISA Logo** or **DHS Seal**, nor should such use be
+          interpreted as an endorsement by CISA or DHS.
+
+#### **Exploit Prediction Scoring System (EPSS)**
+
+- Website: [EPSS - FIRST.org](https://www.first.org/epss)
+- **Usage Agreement**:
+    - EPSS scores are freely available for public use.
+    - **Attribution Requirement**:
+      > "See EPSS at https://www.first.org/epss"  
+      > or  
+      > "Jay Jacobs, Sasha Romanosky, Benjamin Edwards, Michael Roytman, Idris Adjerid, (2021), Exploit Prediction
+      Scoring System, Digital Threats Research and Practice, 2(3)."
+
+---
+
+### Acknowledgments
 
 We would like to acknowledge the work of researchers and contributors who are advancing the field of vulnerability data
-science. Their insights and tools have been instrumental in shaping this project.
+science. Their insights and tools have been instrumental in shaping this project. This project also draws inspiration
+from the broader cybersecurity and data science communities, whose collective efforts improve security practices and
+promote knowledge sharing.
 
 - **[Jay Jacobs](https://www.linkedin.com/in/jayjacobs1/)**  
   Co-founder of the Cyentia Institute, focusing on security metrics and data-driven decision-making in vulnerability
@@ -226,3 +213,4 @@ science. Their insights and tools have been instrumental in shaping this project
 
 We also want to thank the broader cybersecurity and data science communities for their contributions. This project draws
 inspiration from collective efforts to improve security practices and promote knowledge sharing.
+
