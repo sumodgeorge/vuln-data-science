@@ -18,7 +18,7 @@ jupyter:
 
 ## Bar Chart Race: Top 10 Vendors by CVE Count (2002–2024)
 
-This script generates a dynamic bar chart race showcasing the top 10 vendors by CVE count over time (2002–2024). The visualization highlights trends and shifts in vulnerability disclosures across two decades in an engaging video format.
+This script generates a dynamic bar chart race showcasing the top 5 vendors by CVE count over time (2002–2024). The visualization highlights trends and shifts in vulnerability disclosures across two decades in an engaging video format.
 
 ---
 
@@ -46,7 +46,7 @@ This script generates a dynamic bar chart race showcasing the top 10 vendors by 
    - **Fallback Colors**: Vendors without defined colors are assigned visually distinct fallback colors from a predefined color palette (`tab20`).
 
 5. **Generate the Bar Chart Race**:
-   - Animates the top 10 vendors dynamically over time:
+   - Animates the top 5 vendors dynamically over time:
      - Bars update their values and order based on cumulative CVE counts.
      - Customizable parameters enhance readability and aesthetics.
    - Saves the animation as an `.mp4` file for high-quality sharing.
@@ -87,7 +87,7 @@ This script generates a dynamic bar chart race showcasing the top 10 vendors by 
 
 
 
-```python jupyter={"is_executing": true}
+```python
 import os
 import warnings
 
@@ -257,11 +257,11 @@ bar_chart_race(
     filename=output_file,  # Path to save the output file (e.g., .mp4 or .gif)
     orientation="h",  # Horizontal bar chart orientation
     sort="desc",  # Sort bars in descending order by value
-    n_bars=10,  # Display the top 10 vendors at any given time
+    n_bars=5,  # Display the top 5 vendors at any given time
     fixed_order=False,  # Dynamically adjust the order of bars based on value
     fixed_max=True,  # Keep the maximum value on the y-axis consistent across all frames
-    steps_per_period=20,  # Number of steps (frames) per period for smoother transitions
-    period_length=600,  # Duration of each period in milliseconds (controls animation speed)
+    steps_per_period=10,  # Number of steps (frames) per period for smoother transitions
+    period_length=400,  # Duration of each period in milliseconds (controls animation speed)
     interpolate_period=True,  # Smoothly interpolate values between periods
     label_bars=True,  # Display values as labels inside the bars
     bar_size=0.85,  # Adjust bar thickness (0.85 means bars take up 85% of the space)
