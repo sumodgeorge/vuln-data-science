@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "bar-chart-race>=0.1.0",
     "matplotlib>=3.10.0",
     "pandas>=2.2.3",
     "requests>=2.32.3",
@@ -17,4 +18,7 @@ dev = [
     "hatch>=1.14.0",
     "ipython>=8.31.0",
     "jupytext>=1.16.6",
+    "nbqa>=1.9.1",
+    "notebook>=7.3.2",
+    "ruff>=0.8.6",
 ]
