@@ -16,9 +16,9 @@ jupyter:
 
 
 
-## Calculate Cumulative CVE Counts by Vendor (Starting from 1996)
+## Calculate Cumulative CVE Counts by Vendor (Starting from 1999)
 
-This script processes a CSV file containing monthly CVE counts for each vendor, filters the data to start at 1996, and calculates cumulative totals over time. The output is saved as a new CSV file for further analysis.
+This script processes a CSV file containing monthly CVE counts for each vendor, filters the data to start at 1999, and calculates cumulative totals over time. The output is saved as a new CSV file for further analysis.
 
 ### Steps in the Script
 
@@ -29,8 +29,8 @@ This script processes a CSV file containing monthly CVE counts for each vendor, 
    - Generates a range of dates from the earliest to the latest `Year` and `Month` in the dataset.
    - Ensures no months are missing for any vendor by creating a complete time series for all vendors.
 
-3. **Filter Data to Start at 1996**:
-   - After generating the complete date range, filters the data to include only years starting from 1996. This ensures the dataset focuses on meaningful trends and avoids sparse data from earlier years.
+3. **Filter Data to Start at 1999**:
+   - After generating the complete date range, filters the data to include only years starting from 1999. This ensures the dataset focuses on meaningful trends and avoids sparse data from earlier years.
 
 4. **Build a DataFrame for All Vendors and Dates**:
    - Combines the list of unique vendors with the filtered date range using a multi-index.
@@ -55,7 +55,7 @@ This script processes a CSV file containing monthly CVE counts for each vendor, 
 ### Key Features
 
 - **Filters Sparse Early Data**:
-  - Focuses on data from 1996 onwards for improved analysis and visualization.
+  - Focuses on data from 1999 onwards for improved analysis and visualization.
 
 - **Handles Missing Data**:
   - Ensures every month is accounted for, even if no CVEs were reported for a vendor in a given month.
@@ -71,11 +71,11 @@ This script processes a CSV file containing monthly CVE counts for each vendor, 
   - The final output is a CSV file (`vendor_cumulative_counts.csv`) containing:
     | Vendor    | Year | Month | Count | Cumulative_Count |
     |-----------|------|-------|-------|-------------------|
-    | freebsd   | 1996 | 1     | 5     | 5                 |
-    | freebsd   | 1996 | 2     | 0     | 5                 |
-    | freebsd   | 1996 | 3     | 8     | 13                |
-    | redhat    | 1996 | 1     | 0     | 0                 |
-    | redhat    | 1996 | 2     | 15    | 15                |
+    | freebsd   | 1999 | 1     | 5     | 5                 |
+    | freebsd   | 1999 | 2     | 0     | 5                 |
+    | freebsd   | 1999 | 3     | 8     | 13                |
+    | redhat    | 1999 | 1     | 0     | 0                 |
+    | redhat    | 1999 | 2     | 15    | 15                |
 
 
 ```python
@@ -108,8 +108,8 @@ df_full = pd.DataFrame(index=full_index).reset_index()
 df_full["Year"] = df_full["Date"].dt.year
 df_full["Month"] = df_full["Date"].dt.month
 
-# Filter to include only years from 1996 onwards
-df_full = df_full[df_full["Year"] >= 1996]
+# Filter to include only years from 1999 onwards
+df_full = df_full[df_full["Year"] >= 1999]
 
 # Merge with the original data, filling missing counts with 0
 df = pd.merge(df_full, df, on=["Vendor", "Year", "Month"], how="left").fillna({"Count": 0})

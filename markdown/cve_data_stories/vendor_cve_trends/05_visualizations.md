@@ -15,84 +15,90 @@ jupyter:
 # CVE Data Stories: Vendor CVE Trends - Visualizations
 
 
-
-## Bar Chart Race: Top 10 CVE Vendors (1996–2024)
-
-This script generates a dynamic bar chart race showcasing the top 10 vendors by cumulative CVE count over time (1996–2024). CVE data offers critical insights into vendor-specific trends in cybersecurity vulnerabilities, highlighting shifts in the security landscape across two decades.
-
----
-
-### Steps in the Script
-
-1. **Import Necessary Libraries**:
-   - `pandas`: For efficient data manipulation and preprocessing.
-   - `bar_chart_race`: To create the bar chart race animation.
-   - `matplotlib`: For additional visual customizations, including fonts and color palettes.
-
-2. **Load and Preprocess Data**:
-   - Reads a CSV file (`vendor_top_20.csv`) containing cumulative CVE counts for vendors by year and month.
-   - Normalizes vendor names for consistency.
-   - Ensures inclusion of all vendors that appeared in the top 20 during the analyzed period.
-
-3. **Pivot and Format Data**:
-   - Prepares the dataset for visualization by transforming it into a pivot table:
-     - **Rows**: Time (`Year`, `Month`).
-     - **Columns**: Vendors.
-     - **Values**: Cumulative CVE counts.
-   - Combines `Year` and `Month` into a `Date` column (`YYYY-MM`) for a continuous time index.
-
-4. **Assign Colors**:
-   - **Brand Colors**: Maps vendors to their official brand colors for easy recognition.
-   - **Fallback Colors**: Assigns visually distinct colors to vendors without defined brand colors.
-
-5. **Generate the Bar Chart Race**:
-   - Animates the top 10 vendors dynamically over time:
-     - Bars update their positions and lengths based on cumulative CVE counts.
-     - Parameters enhance readability and visual storytelling.
-   - Saves the animation as an `.mp4` file for high-quality sharing.
-
----
-
-### Key Parameters
-
-- **Top Vendors (`n_bars`)**: Displays the top 10 vendors based on cumulative CVE counts.
-- **Dynamic Ordering (`fixed_order=False`)**: Updates the bar order dynamically to reflect changes in rankings.
-- **Y-Axis Consistency (`fixed_max=True`)**: Maintains a consistent y-axis scale to enable meaningful visual comparisons.
-- **Smooth Transitions (`steps_per_period=10`)**: Creates fluid animations between monthly time steps.
-- **Frame Duration (`period_length=400`)**: Each time step lasts 400 milliseconds for optimal pacing.
-
----
-
-### Customization
-
-- **Visual Enhancements**:
-   - Clear labels with larger fonts (`bar_label_size=12`) improve readability.
-   - High resolution (`dpi=300`) ensures professional-quality visuals suitable for presentations and reports.
-- **Colors**:
-   - Brand colors make it easy to identify key vendors.
-   - Fallback colors ensure distinction for all other vendors.
-
----
-
-### Output
-
-- **Video File**:
-   - The animation is saved as `top_10_vendors_cve_trends_2002_2024.mp4`, ready for sharing and embedding.
-
-- **Insights**:
-   - Tracks the dynamic evolution of CVE counts by vendor.
-   - Highlights key shifts and emerging trends in vulnerability disclosures across two decades, providing actionable insights into the cybersecurity landscape.
-
-
-```python jupyter={"is_executing": true}
-import os
+```python
 import warnings
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from bar_chart_race import bar_chart_race
 from matplotlib.colors import to_hex
+```
 
+
+
+
+## Bar Chart Race: Top CVE Vendors (1999–2024)
+
+This script generates dynamic bar chart race visualizations that showcase the top vendors by cumulative CVE count over time, covering the years 1999–2024. The project provides insights into long-term trends in vendor-specific vulnerabilities, highlighting shifts in the cybersecurity landscape over two decades.
+
+---
+
+### Purpose
+
+- **Analyze Vulnerability Trends**: Understand which vendors have consistently had the most reported vulnerabilities and how rankings have evolved over time.
+- **Engage Through Visualization**: Present data in a visually compelling way that draws attention to key trends in cybersecurity.
+- **Inspire Data-Driven Discussions**: Encourage conversations about how this data can inform risk management strategies.
+
+---
+
+### Workflow
+
+1. **Setup and Data Loading**:
+   - Imports libraries for data manipulation (`pandas`), visualization (`bar_chart_race`, `matplotlib`), and system utilities (`os`, `warnings`).
+   - Suppresses irrelevant warnings to streamline outputs.
+   - Reads a preprocessed CSV file (`vendor_top_20.csv`) containing cumulative CVE counts by vendor, year, and month.
+
+2. **Vendor Name Normalization**:
+   - Ensures vendor names are clean and consistent using a mapping dictionary.
+   - Handles variations in vendor naming for accurate aggregation.
+
+3. **Data Transformation**:
+   - Converts the `Year` and `Month` columns into a `datetime` format for proper sorting and animation.
+   - Pivots the dataset to create a table where:
+     - **Rows**: Time intervals (monthly or yearly).
+     - **Columns**: Vendors.
+     - **Values**: Cumulative CVE counts.
+   - Prepares both monthly and yearly datasets for separate animations.
+
+4. **Color Assignment**:
+   - Assigns official brand colors to vendors where available for consistent identification.
+   - Generates fallback colors for vendors without official brand palettes, ensuring a visually distinct output.
+
+5. **Bar Chart Race Generation**:
+   - Creates animations for:
+     - **Monthly Data**: Top 10 vendors shown dynamically across monthly time steps, saved as an `.mp4` file.
+     - **Yearly Data**: Top 5 vendors aggregated by year, optimized as a `.gif` file for LinkedIn sharing.
+   - Configures parameters for animation smoothness, readability, and file size optimization.
+
+---
+
+### Parameters for Customization
+
+- **Top Vendors (`n_bars`)**:
+   - Displays the top 10 vendors for monthly visualizations and top 5 for yearly GIFs.
+- **Dynamic Rankings (`fixed_order=False`)**:
+   - Bar positions adjust dynamically based on rankings in each time interval.
+- **Y-Axis Consistency (`fixed_max=True`)**:
+   - Maintains a fixed scale across time intervals for meaningful comparisons.
+- **Transition Smoothness (`steps_per_period`)**:
+   - Controls animation fluidity, with fewer steps used for smaller file sizes.
+- **Animation Speed (`period_length`)**:
+   - Adjusted for LinkedIn-friendly GIFs with faster transitions.
+
+---
+
+### Outputs
+
+1. **Monthly Animation (`.mp4`)**:
+   - High-quality video highlighting the top 10 vendors month by month.
+   - Saved as `top_10_vendors_cve_trends_1999_2024.mp4`.
+
+2. **Yearly Animation (`.gif`)**:
+   - Lightweight GIF optimized for LinkedIn, showing top 5 vendors per year.
+   - Saved as `top_5_vendors_cve_trends_1999_2024.gif`.
+
+
+```python
 # Suppress font warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -239,35 +245,131 @@ colors = [
     brand_colors.get(vendor, fallback_colors[i % len(fallback_colors)])
     for i, vendor in enumerate(df_pivot.columns)
 ]
+```
 
+### Generate Monthly MP4 Bar Chart Race
+In this step, we generate a bar chart race video in MP4 format that visualizes cumulative CVE counts by vendor over time, aggregated monthly.
+
+- The output video will display the **top 10 vendors** ranked by their cumulative CVE counts for each month from 1999 to 2024.
+- The `period_length` and `steps_per_period` control the animation speed and smoothness.
+- The resolution (`dpi=300`) ensures high-quality output.
+
+The resulting MP4 file will be saved to the specified path.
+
+
+```python jupyter={"is_executing": true}
 # Output file path
-output_file = "../../../data/cve_data_stories/vendor_cve_trends/processed/top_10_vendors_cve_trends_1996_2024.mp4"
-os.makedirs(os.path.dirname(output_file), exist_ok=True)
+output_file = "../../../data/cve_data_stories/vendor_cve_trends/processed/top_10_vendors_cve_trends_1999_2024.mp4"
 
 # Generate bar chart race
 bar_chart_race(
-    df=df_pivot,  # The pivoted DataFrame containing cumulative CVE counts by vendor over time.
-    filename=output_file,  # Path to save the output video (e.g., .mp4). Set to None to display inline in a notebook.
-    orientation="h",  # Display bars horizontally to show vendor trends over time.
-    sort="desc",  # Sort vendors by descending CVE count for each time period.
-    n_bars=10,  # Number of top CVE vendors to display at any given time.
-    fixed_order=False,  # Allow the order of vendors to change dynamically as CVE counts update over time.
-    fixed_max=True,  # Keep the maximum CVE count consistent across all time periods for better comparison.
-    steps_per_period=10,  # Number of animation frames to transition between each month.
-    period_length=400,  # Duration (in milliseconds) for each month in the animation.
-    interpolate_period=True,  # Smoothly interpolate CVE counts between months for fluid animation.
-    label_bars=True,  # Display the CVE count as a label on each bar.
-    bar_size=0.85,  # Thickness of each bar as a fraction of the available space for the month.
-    period_label={"size": 16, "x": 0.85, "y": 0.25},  # Customize the date label for each month (size and position).
-    period_fmt="%Y-%m",  # Format of the date label displayed for each time period (e.g., "2023-01").
-    title="Top Vendors by CVE",  # Title of the bar chart animation.
-    title_size=20,  # Font size for the chart title.
-    bar_label_size=12,  # Font size for the CVE count labels displayed on each bar.
-    tick_label_size=10,  # Font size for axis tick labels (representing CVE counts).
-    cmap=colors,  # Colors for each vendor's bar, using brand colors or fallback colors if unspecified.
-    dpi=300,  # Resolution of the output video (higher DPI produces better quality but larger files).
-    bar_kwargs={"alpha": 0.85},  # Set the transparency of the bars (alpha value).
+    df=df_pivot,  # Pivoted DataFrame with cumulative CVE counts by vendor over time
+    filename=output_file,  # Path to save the output video (e.g., .mp4). Set to None to display inline
+    orientation="h",  # Display bars horizontally to show vendor trends over time
+    sort="desc",  # Sort vendors by descending CVE count for each time period
+    n_bars=10,  # Display the top 10 vendors at any given time
+    fixed_order=False,  # Allow dynamic changes in the order of vendors as CVE counts update
+    fixed_max=True,  # Keep the maximum y-axis value consistent across all time periods
+    steps_per_period=10,  # Number of animation frames to transition between each month
+    period_length=400,  # Duration (in milliseconds) of each month in the animation
+    interpolate_period=True,  # Smoothly interpolate CVE counts between months for fluid animation
+    label_bars=True,  # Display the CVE count as a label on each bar
+    bar_size=0.85,  # Thickness of each bar as a fraction of the available space
+    period_label={"size": 16, "x": 0.85, "y": 0.25},  # Customize date label size and position for each month
+    period_fmt="%Y-%m",  # Format of the date label displayed for each time period (e.g., "2023-01")
+    title="Top Vendors by CVE",  # Title of the bar chart animation
+    title_size=20,  # Font size for the chart title
+    bar_label_size=12,  # Font size for the CVE count labels displayed on each bar
+    tick_label_size=10,  # Font size for axis tick labels (representing CVE counts)
+    cmap=colors,  # Colors for each vendor's bar, using brand or fallback colors
+    dpi=300,  # Resolution of the output video (higher DPI produces better quality)
+    bar_kwargs={"alpha": 0.85},  # Set the transparency of the bars (alpha value)
 )
 
-print(f"Bar chart race saved to {output_file}.")
+print(f"Bar chart race mp4 saved to {output_file}.")
+```
+
+### Prepare Data for Yearly GIF
+To simplify the visualization for LinkedIn, the CVE data is aggregated by year instead of monthly intervals. This reduces the size and complexity of the bar chart race while maintaining key trends.
+
+#### Steps:
+1. **Convert Index to Datetime**:
+   - The date index is converted to a datetime format for proper resampling.
+
+2. **Resample by Year-End**:
+   - Using the `resample('YE').last()` method, we extract the **last value of each year**. This ensures that the cumulative data accurately reflects the total CVE count for each vendor by the end of the year.
+
+3. **Format the Index**:
+   - The index is updated to show only the year as a string for clarity in the visualization.
+
+4. **Handle Missing Data**:
+   - Any missing values (`NaN`) are filled with `0` to prevent gaps in the animation.
+
+5. **Avoid Rendering Issues**:
+   - A small value (`1e-5`) is added to the data to avoid potential rendering artifacts during animation.
+
+6. **Ensure Complete Year Range**:
+   - The data is reindexed to include all years in the range, filling any missing years with `0`.
+
+```python
+# Convert index to datetime and resample
+df_pivot.index = pd.to_datetime(df_pivot.index)
+df_yearly = df_pivot.resample('YE').last()  # Use last value of each year for cumulative data
+
+# Update index to show only the year
+df_yearly.index = df_yearly.index.year.astype(str)  # Convert years to strings for proper formatting
+
+# Fill NaN values
+df_yearly = df_yearly.fillna(0)
+
+# Add a small value to avoid rendering issues
+df_yearly += 1e-5
+
+# Ensure all years are present
+all_years = [str(year) for year in range(int(df_yearly.index[0]), int(df_yearly.index[-1]) + 1)]
+df_yearly = df_yearly.reindex(all_years, fill_value=0)
+```
+
+### Generate Yearly GIF Bar Chart Race
+Using the aggregated yearly data, we create a **GIF optimized for LinkedIn**.
+
+- The GIF shows the **top 5 vendors** ranked by cumulative CVE counts for each year from 1999 to 2024.
+- To ensure the file size is within LinkedIn's 8MB limit:
+  - Resolution is reduced (`dpi=150`).
+  - Animation transitions are faster (`period_length=200` milliseconds).
+  - Fewer steps per period (`steps_per_period=5`) reduce frame count.
+
+The resulting GIF will be saved to the specified path.
+
+
+```python
+# Output file path
+output_file = "../../../data/cve_data_stories/vendor_cve_trends/processed/top_5_vendors_cve_trends_1999_2024.gif"
+
+# Generate bar chart race
+bar_chart_race(
+    df=df_yearly,  # Aggregated DataFrame with yearly cumulative CVE counts by vendor
+    filename=output_file,  # Path to save the output GIF (optimized for LinkedIn)
+    orientation="h",  # Display bars horizontally to show vendor trends over time
+    sort="desc",  # Sort vendors by descending CVE count for each year
+    n_bars=5,  # Display the top 5 vendors at any given time
+    fixed_order=False,  # Allow dynamic changes in the order of vendors as CVE counts update
+    fixed_max=True,  # Keep the maximum y-axis value consistent across all time periods
+    steps_per_period=5,  # Number of animation frames to transition between each year
+    period_length=200,  # Duration (in milliseconds) of each year in the animation
+    interpolate_period=False,  # Disable interpolation to avoid rendering artifacts
+    label_bars=True,  # Display the CVE count as a label on each bar
+    bar_size=0.85,  # Thickness of each bar as a fraction of the available space
+    period_label={"size": 16, "x": 0.85, "y": 0.25},  # Customize date label size and position for each year
+    period_fmt="{x}",  # Display the year as it appears in the DataFrame index
+    title="Top Vendors by CVE (Yearly)",  # Title of the bar chart animation
+    title_size=18,  # Font size for the chart title
+    bar_label_size=10,  # Font size for the CVE count labels displayed on each bar
+    tick_label_size=8,  # Font size for axis tick labels (representing CVE counts)
+    cmap=colors,  # Colors for each vendor's bar, using brand or fallback colors
+    dpi=150,  # Resolution of the output GIF (optimized for smaller file size)
+    bar_kwargs={"alpha": 0.85},  # Set the transparency of the bars (alpha value)
+)
+
+print(f"Bar chart race gif saved to {output_file}.")
 ```
