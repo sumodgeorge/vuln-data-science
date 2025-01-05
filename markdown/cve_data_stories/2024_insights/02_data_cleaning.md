@@ -65,9 +65,9 @@ This script processes NVD JSON data for a specified year and enriches it with CI
 ```python
 def process_nvd_data(year):
     # Define input & output paths
-    file_path = f'../../data/2024_insights/raw/nvdcve-1.1-{year}.json'
-    cisa_kev_path = '../../data/2024_insights/raw/known_exploited_vulnerabilities.csv'
-    output_path_template = '../../data/2024_insights/processed/nvd_data_{}.csv'
+    file_path = f'../../data/cve_data_stories/raw/nvdcve-1.1-{year}.json'
+    cisa_kev_path = '../../../data/cve_data_stories/raw/known_exploited_vulnerabilities.csv'
+    output_path_template = '../../data/cve_data_stories/processed/nvd_data_{}.csv'
 
     # Load the NVD JSON data for the given year
     with open(file_path, 'r') as file:

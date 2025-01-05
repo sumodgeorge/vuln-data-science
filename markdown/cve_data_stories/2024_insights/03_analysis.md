@@ -26,8 +26,8 @@ print(f"Data generated on: {generated_date}")
 ```
 
 ```python
-df_2024 = pd.read_csv('../../data/2024_insights/processed/nvd_data_2024.csv')
-df_2023 = pd.read_csv('../../data/2024_insights/processed/nvd_data_2023.csv')
+df_2024 = pd.read_csv('../../../data/2024_insights/processed/nvd_data_2024.csv')
+df_2023 = pd.read_csv('../../../data/2024_insights/processed/nvd_data_2023.csv')
 
 df_2024.head()
 ```
@@ -102,7 +102,7 @@ overview_metrics = {
 }
 
 # Save the overview metrics to a JSON file
-output_path = "../../data/2024_insights/output/overview_metrics.json"
+output_path = "../../../data/2024_insights/output/overview_metrics.json"
 with open(output_path, "w") as f:
     json.dump(overview_metrics, f)
 ```
@@ -185,7 +185,7 @@ time_series_metrics = {
 }
 
 # Save the time_series_metrics to a JSON file
-with open("../../data/2024_insights/output/time_series_metrics.json", "w") as f:
+with open("../../../data/2024_insights/output/time_series_metrics.json", "w") as f:
     json.dump(time_series_metrics, f)
 ```
 
@@ -342,7 +342,7 @@ vendor_product = {
 }
 
 # Save the vendor_product metrics to a JSON file
-with open("../../data/2024_insights/output/vendor_product_analysis.json", "w") as f:
+with open("../../../data/2024_insights/output/vendor_product_analysis.json", "w") as f:
     json.dump(vendor_product, f)
 ```
 
@@ -462,7 +462,7 @@ cisa_kev = {
 }
 
 # Save JSON to File
-output_path = "../../data/2024_insights/output/cisa_kev_analysis.json"
+output_path = "../../../data/2024_insights/output/cisa_kev_analysis.json"
 with open(output_path, "w") as f:
     json.dump(cisa_kev, f)
 ```
@@ -561,7 +561,7 @@ def handle_nan_values(obj):
 specific_cve_details_cleaned = handle_nan_values(specific_cve_details)
 
 # Save the specific CVE details to a JSON file
-output_path = "../../data/2024_insights/output/cve_details.json"
+output_path = "../../../data/2024_insights/output/cve_details.json"
 with open(output_path, "w") as f:
     json.dump(specific_cve_details_cleaned, f)
 ```
@@ -649,6 +649,6 @@ top_assigners = {
 }
 
 # Save the top_assigners metrics to a JSON file
-with open("../../data/2024_insights/output/top_assigners.json", "w") as f:
+with open("../../../data/2024_insights/output/top_assigners.json", "w") as f:
     json.dump(top_assigners, f)
 ```
