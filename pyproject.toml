@@ -6,8 +6,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "bar-chart-race>=0.1.0",
+    "great-tables>=0.16.1",
     "matplotlib>=3.10.0",
     "pandas>=2.2.3",
+    "polars>=1.22.0",
     "requests>=2.32.3",
     "seaborn>=0.13.2",
 ]
