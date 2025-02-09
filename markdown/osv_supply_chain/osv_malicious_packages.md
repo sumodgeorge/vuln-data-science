@@ -12,6 +12,25 @@ jupyter:
     name: python3
 ---
 
+# 📊 OSV Security Trends: Malicious Code & Vulnerabilities in Software Supply Chains  
+
+This notebook analyzes **OSV data**, highlighting **malicious code campaigns** and **vulnerabilities** across key ecosystems like **npm, PyPI, and Maven**.  
+
+## 🔍 Overview  
+- **npm had over 19K affected packages**, making it the most impacted registry.  
+- **PyPI & Maven continue to show vulnerability spikes**, especially in recent years.  
+- **Malicious Code vs. Vulnerabilities:** Attackers embed **malicious dependencies** and exploit **supply chain weaknesses.**  
+
+## 🔗 Data Source  
+- **Source:** [OSV.dev](https://osv.dev) (Open Source Vulnerability)  
+
+
+## 📥 Load OSV Ecosystem Summary Data  
+
+The dataset contains a summary of **ecosystem-specific OSV vulnerabilities and malicious code incidents** across multiple years.  
+
+We will load and preview the dataset:  
+
 ```python vscode={"languageId": "python"}
 import pandas as pd
 
@@ -19,8 +38,16 @@ df = pd.read_csv("../../data/osv/processed/osv_ecosystem_summary.csv")
 df.head(1)
 ```
 
+## 📊 Creating a Security Trends Table  
+
+We will use **Great Tables** to create an interactive summary of the OSV dataset, featuring:  
+- **Ecosystem breakdown** (npm, PyPI, Maven, etc.)  
+- **Type of threat** (🐞 Vulnerability | 💀 Malicious Code)  
+- **Peak attack year**  
+- **Trend data visualization** (bar charts for yearly trends)  
+
 ```python vscode={"languageId": "python"}
-from great_tables import GT, md, html, nanoplot_options
+from great_tables import GT, md, nanoplot_options
 import pandas as pd
 import numpy as np
 import ast
@@ -64,12 +91,12 @@ gt_table = (
     .tab_source_note(
         source_note=md("**Legend:** Bug = Vulnerability | Skull = Malicious Code")
     )
-    .tab_stubhead(label="Ecosystem")
+    .tab_stubhead(label=md("*Ecosystem*"))
     .cols_label(
         ecosystem="Ecosystem",
         icon="Type",
-        total_affected="Total",
-        peak_attack_year="Peak",
+        total_affected="Total Affected Packages",
+        peak_attack_year="Peak Year",
         trend_data="Year Trend",
     )
     .fmt_nanoplot(
@@ -79,7 +106,7 @@ gt_table = (
         options=nanoplot_options(
             data_bar_stroke_color="black",
             data_bar_stroke_width=2,
-            data_bar_fill_color="darkgray",
+            data_bar_fill_color="darkred",
             reference_line_color="pink",
         ),
     )
@@ -91,8 +118,13 @@ gt_table = (
     )
     .fmt_icon(columns="icon", fill_color=color_map)
 )
+```
 
+## 💾 Saving and Displaying the Table  
 
+The interactive table will be saved as an **HTML file** and displayed in the notebook.
+
+```python vscode={"languageId": "python"}
 # Generate the raw HTML from the table
 html_output = gt_table.as_raw_html()
 
